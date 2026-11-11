@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="InneR: Inner Product Regularization for Imitation Learning">
+  <meta name="keywords" content="imitation learning, regularization, diffusion policy, robot learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="Inner Product Regularization for Imitation Learning">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://collab.me.vt.edu/inner/">
+  <title>Inner Product Regularization for Imitation Learning</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="./static/css/inner.css">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/data.js"></script>
+  <script src="./static/js/figures.js"></script>
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+
+<body>
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title publication-title" style="font-size: 2.8rem;">
+              Inner Product Regularization<br>for Imitation Learning
+            </h1>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><a href="https://github.com/benjaminchristie" target="_blank">Benjamin A. Christie</a>,</span>
+              <span class="author-block">Tianyu Qiu,</span>
+              <span class="author-block">Amy H. Choi,</span>
+              <span class="author-block">David Fridovich-Keil,</span>
+              <span class="author-block"><a href="https://dylanlosey.com/" target="_blank">Dylan P. Losey</a></span>
+            </div>
+
+            <!-- affiliations go here -->
+            <div class="is-size-5 publication-authors">
+              <span>Under Review</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a class="button is-normal is-rounded is-dark" disabled title="Coming soon">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a class="button is-normal is-rounded is-dark" disabled title="Coming soon">
+                    <span class="icon"><i class="ai ai-arxiv"></i></span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/VT-Collab/inner" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>Code</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <h2 class="subtitle has-text-centered is-size-4">
+          <strong><i>If moving an irrelevant object does not change the policy at one state,
+              it should not change it at a nearby state.</i></strong>
+        </h2>
+        <img src="./static/resources/front.jpg"
+          alt="A robot closing a coffee machine. Under behavior cloning the policy reacts to moving the coffee machine and to moving a banana; with InneR it reacts only to the coffee machine.">
+      </div>
+    </div>
+  </section>
+
+  <section class="hero is-light is-small">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Robots that learn from demonstrations should extrapolate their policy despite state perturbations such
+                as sensor noise, scene variation, and compounding errors. Prior works use regularizers to limit the
+                policy's sensitivity to any perturbation at each individual state. By contrast, our insight is that
+                nearby states should respond to the same perturbation consistently: if moving an irrelevant object
+                does not change the policy at one state, it should not at a nearby state. We therefore develop inner
+                product regularization (InneR). We show that the inner product on action space induces an inner
+                product on state space through the policy Jacobian (the Fisher information for stochastic policies),
+                whose null space governs which perturbations have a first-order effect on the policy. Regularizing
+                each inner product alone only shrinks the policy's sensitivity. Instead, InneR clusters states with
+                aligned inner products, averages each cluster, and minimizes the smallest eigenvalues of that average
+                so that nearby states share a common null space. InneR thus enforces consistent responses without
+                limiting policy expressiveness, and can be appended to existing imitation learning pipelines for
+                deterministic or stochastic policies.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">Method</h2>
+      <div class="content">
+        <p>
+          Let \(\Delta\) be a small perturbation of the state \(s\). To first order the policy's action changes by
+          \(J(s)\Delta\), where \(J(s) \in \mathbb{R}^{m \times n}\) is the Jacobian of the policy with respect to the
+          state. If we measure distances between actions with an inner product \(M\), then
+        </p>
+        <p>\[ \|\pi_\theta(s+\Delta) - \pi_\theta(s)\|_M \approx \|\Delta\|_{A(s)}, \qquad A(s) = J(s)^T M J(s). \]</p>
+        <p>
+          \(A(s)\) is an inner product matrix on state space. Perturbations in its null space have no first-order
+          effect on the action. For a stochastic policy the same role is played by the Fisher information with respect
+          to the state,
+        </p>
+        <p>\[ F(s) = \mathbb{E}_{a \sim \pi_\theta(\cdot \mid s)}\big[ g\, g^T \big], \qquad g = \nabla_s \log \pi_\theta(a \mid s), \]</p>
+        <p>
+          which we estimate for diffusion policies from the gradient of the evidence lower bound.
+        </p>
+        <p>
+          We want nearby states to ignore the same perturbations, i.e., to share a null space. The average
+          \(\bar{A} = \tfrac{1}{k}\sum A(s)\) over a set of states has a null space equal to the intersection of the
+          individual null spaces, so its \(n-m\) smallest eigenvalues measure how far those states are from sharing
+          one.
+        </p>
+        <p>
+          The directions that matter can change over a task, so InneR does not average over the whole dataset. For
+          every state \(s_i\) in a training batch we form a region \(\mathcal{B}_i\) from the \(k\) states whose
+          inner products are best aligned with \(A(s_i)\), using the distance
+          \(\|V_iV_i^T - V_jV_j^T\|_F\) between the row spaces of their Jacobians. With
+          \(\lambda^i_1 \geq \dots \geq \lambda^i_n\) the eigenvalues of the region's average \(\bar{A}_i\), the
+          loss is the fraction of each average that lies in the shared null space:
+        </p>
+        <p>\[ \mathcal{L}_\mathrm{InneR}(\theta) = \frac{1}{B} \sum_{i=1}^{B} \frac{\sum_{j=m+1}^{n} \lambda^i_j}{\operatorname{sg}\big(\sum_{j=1}^{n} \lambda^i_j\big)}, \qquad \mathcal{L}(\theta) \leftarrow \mathcal{L}(\theta) + \gamma\, \mathcal{L}_\mathrm{InneR}(\theta). \]</p>
+        <p>
+          Frobenius and nuclear norm penalties act on each \(J(s)\) by itself. They make the policy less sensitive
+          at that state, but they do not align the null spaces of different states.
+        </p>
+      </div>
+
+      <h3 class="title is-5" style="margin-top: 2rem;">A small example</h3>
+      <p>
+        Twelve states with a two-dimensional state and a one-dimensional action, so every state responds to one
+        direction and ignores the other. The states come from two parts of a task that depend on different directions.
+      </p>
+      <div class="figure" id="fig-idea"></div>
+      <div class="step-text">
+        <h4>1. Sensitivity at each state</h4>
+        <p>The black tick is the direction a state responds to, the row space of its Jacobian in
+          \(A(s_i) = J(s_i)^T M J(s_i)\). The gray strokes follow the direction that is ignored, and the
+          orange strokes the direction that should be ignored. After behavior cloning the two disagree, because the
+          data is noisy.</p>
+      </div>
+      <div class="step-text">
+        <h4>2. Regions</h4>
+        <p>For each state we take the \(k = 6\) states whose inner products are best aligned with it, measured by
+          \(\|V_iV_i^T - V_jV_j^T\|_F\). The shaded states are the region of the selected state. Click another
+          state to see its region.</p>
+      </div>
+      <div class="step-text">
+        <h4>3. Average</h4>
+        <p>We average the inner products over the region,
+          \(\bar{A}_i = \tfrac{1}{k}\sum_{s \in \mathcal{B}_i} A(s)\). The ellipse is this average and the bars are
+          its eigenvalues. \(\lambda_2\) is not zero because the states in the region ignore different
+          directions.</p>
+      </div>
+      <div class="step-text">
+        <h4>4. Penalty</h4>
+        <p>InneR adds \(\lambda_2 / \operatorname{sg}(\lambda_1 + \lambda_2)\), averaged over the regions, to the
+          imitation loss. Training rotates the states of each region onto a common direction, and the gray
+          strokes line up with the orange ones.</p>
+      </div>
+      <div class="step-text">
+        <h4>5. Try it</h4>
+        <p>Change \(\gamma\) and \(k\) below, or apply a norm penalty instead. Drag the white dot to probe another
+          point. Drag a state to turn the direction its data gives. With \(k = 12\) there is no clustering and
+          both parts of the task are pulled onto one direction.</p>
+      </div>
+
+      <h3 class="title is-5" style="margin-top: 2.5rem;">Training</h3>
+      <p>
+        The same example trained from a random initialization, with the InneR term in the loss from the first step.
+        Both policies start from the same directions and take the same number of gradient steps.
+      </p>
+      <div class="figure" id="fig-training"></div>
+      <p class="caption">
+        Behavior cloning fits the noisy data exactly, so its imitation loss goes to zero and its error stays.
+        InneR ends with a higher imitation loss and a lower error. A large \(\gamma\) can pull the directions together
+        before the imitation loss has sorted them out; try \(\gamma = 3\) with a few initializations.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">Simulated Experiments</h2>
+      <div class="legend sim-legend">
+        <span><span class="swatch" style="background: #808080"></span>BC</span>
+        <span><span class="swatch" style="background: #4d4d4d"></span>Frobenius</span>
+        <span><span class="swatch" style="background: #9b7653"></span>Nuclear</span>
+        <span><span class="swatch" style="background: #8b6fae"></span>InneR-C (no clustering)</span>
+        <span><span class="swatch" style="background: #ff9900"></span>InneR</span>
+      </div>
+
+      <h3 class="title is-5">Single integrator</h3>
+      <div class="figure gallery" data-items='[
+        {"label": "Irrelevant dimensions", "src": "sim1-irrelevant.svg", "width": 92, "caption": "Final state error as irrelevant state dimensions are added. Lower is better."},
+        {"label": "Dataset size", "src": "sim2-data.svg", "width": 100, "caption": "Final state error against the number of demonstrations (left) and what each method regularizes (right)."},
+        {"label": "Distribution shift", "src": "sim3-shift.svg", "width": 52, "caption": "The irrelevant dimensions are correlated with the goal during training and not at test time."},
+        {"label": "Dispersed information", "src": "sim4-scramble.svg", "width": 52, "caption": "An invertible nonlinear map is applied to the state before the policy sees it."}]'></div>
+
+      <h3 class="title is-5" style="margin-top: 2rem;">Drone landing</h3>
+      <div class="figure gallery" data-items='[
+        {"label": "Irrelevant dimensions", "src": "drone_fig_irrelevant.svg", "width": 52, "caption": "Landing success rate as distractor drones are added to the state. Higher is better."},
+        {"label": "Dataset size", "src": "drone_fig_data.svg", "width": 100, "caption": "Landing success rate against the number of demonstrations (left) and what each method regularizes (right)."},
+        {"label": "Distribution shift", "src": "drone_fig_shift.svg", "width": 52, "caption": "A distractor goal is correlated with the true goal during training and not at test time."},
+        {"label": "Dispersed information", "src": "drone_fig_scramble.svg", "width": 52, "caption": "An invertible nonlinear map is applied to the state before the policy sees it."}]'></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">Real-World Experiments</h2>
+      <p class="lead">
+        We trained diffusion policies for three tasks on a Franka arm: closing a coffee maker, stacking two cubes, and
+        pushing a pot. An apple, an orange, and a banana are also on the table. All methods use the same
+        demonstrations and the same network.
+      </p>
+      <div class="figure">
+        <svg viewBox="0 0 960 292" role="img"
+          aria-label="Pipeline: on the robot, an RGB-D camera feeds object tracking, which gives the state for a diffusion policy that commands the arm at 10 Hz. For training, demonstrations are tracked the same way, augmented with rotated copies, and used to train the policy with the imitation loss plus the InneR loss.">
+          <defs>
+            <marker id="pipe-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 Z" fill="#555"></path>
+            </marker>
+          </defs>
+          <g class="pipe">
+            <text x="20" y="20" class="group-title">On the robot</text>
+            <rect x="20" y="52" width="160" height="66" rx="6"></rect>
+            <text x="100" y="80" class="pipe-title">RGB-D camera</text>
+            <text x="100" y="100" class="pipe-sub">one fixed view</text>
+            <rect x="215" y="52" width="160" height="66" rx="6"></rect>
+            <text x="295" y="80" class="pipe-title">Track objects</text>
+            <text x="295" y="100" class="pipe-sub">SAM 3, EdgeTAM</text>
+            <rect x="410" y="52" width="160" height="66" rx="6"></rect>
+            <text x="490" y="80" class="pipe-title">State</text>
+            <text x="490" y="100" class="pipe-sub">gripper and object poses</text>
+            <rect x="605" y="52" width="160" height="66" rx="6"></rect>
+            <text x="685" y="80" class="pipe-title">Diffusion policy</text>
+            <text x="685" y="100" class="pipe-sub">MLP denoiser, DDIM</text>
+            <rect x="800" y="52" width="140" height="66" rx="6"></rect>
+            <text x="870" y="80" class="pipe-title">Franka arm</text>
+            <text x="870" y="100" class="pipe-sub">target 0.5 s ahead</text>
+            <path class="pipe-line" d="M180,85 L211,85"></path>
+            <path class="pipe-line" d="M375,85 L406,85"></path>
+            <path class="pipe-line" d="M570,85 L601,85"></path>
+            <path class="pipe-line" d="M765,85 L796,85"></path>
+            <path class="pipe-line" d="M870,52 L870,34 L100,34 L100,48"></path>
+            <text x="485" y="28" class="pipe-sub">10 Hz</text>
+
+            <text x="20" y="176" class="group-title">Training</text>
+            <rect x="20" y="206" width="160" height="66" rx="6"></rect>
+            <text x="100" y="234" class="pipe-title">Demonstrations</text>
+            <text x="100" y="254" class="pipe-sub">25 to 50 per task</text>
+            <rect x="215" y="206" width="160" height="66" rx="6"></rect>
+            <text x="295" y="234" class="pipe-title">Track objects</text>
+            <text x="295" y="254" class="pipe-sub">same as on the robot</text>
+            <rect x="410" y="206" width="160" height="66" rx="6"></rect>
+            <text x="490" y="234" class="pipe-title">Rotated copies</text>
+            <text x="490" y="254" class="pipe-sub">100 to 300 per task</text>
+            <rect class="pipe-inner" x="605" y="206" width="160" height="66" rx="6"></rect>
+            <text x="685" y="234" class="pipe-title">Imitation + γ · InneR</text>
+            <text x="685" y="254" class="pipe-sub">training loss</text>
+            <path class="pipe-line" d="M180,239 L211,239"></path>
+            <path class="pipe-line" d="M375,239 L406,239"></path>
+            <path class="pipe-line" d="M570,239 L601,239"></path>
+            <path class="pipe-line" d="M685,206 L685,122"></path>
+            <text x="695" y="168" class="pipe-sub" style="text-anchor: start;">trains</text>
+          </g>
+        </svg>
+      </div>
+      <p class="caption">
+        The policy never sees images. Objects are tracked in the camera image and their poses, together with the
+        gripper's, form the state. The baselines use the same pipeline with a different training loss.
+      </p>
+
+      <div class="figure" id="fig-clips"></div>
+      <p class="caption">
+        Three distractors, 3× speed. Objects are tinted by the masks used to track them.
+      </p>
+
+      <h3 class="title is-5" style="margin-top: 2.5rem;">Success rate</h3>
+      <div class="figure" id="fig-success"></div>
+      <p class="caption">
+        The number of distractors is the number of fruit whose pose is in the policy's state. Whiskers are standard
+        error. Hover over a bar for the number of trials.
+      </p>
+
+      <h3 class="title is-5" style="margin-top: 2.5rem;">Observation noise</h3>
+      <div class="figure narrow" id="fig-noise"></div>
+      <p class="caption">
+        <em>Close</em> with three distractors. Gaussian noise is added to every object position that the policy
+        observes. Ten trials per point, twenty without noise.
+      </p>
+
+      <h3 class="title is-5" style="margin-top: 2.5rem;">Sensitivity to each object</h3>
+      <div class="figure" id="fig-sensitivity"></div>
+      <p class="caption">
+        Change in the commanded gripper position when one object is displaced by 1 cm, for the three-distractor
+        policies at states from the real-world trials. Selectivity is the mean over task objects divided by the mean
+        over distractors.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3">BibTeX</h2>
+      <pre class="bibtex"><code>@article{christie2026inner,
+  title   = {Inner Product Regularization for Imitation Learning},
+  author  = {Christie, Benjamin A. and Qiu, Tianyu and Choi, Amy H. and Fridovich-Keil, David and Losey, Dylan P.},
+  year    = {2026},
+  note    = {Under review}
+}</code></pre>
+    </div>
+  </section>
+
+</body>
+
+</html>

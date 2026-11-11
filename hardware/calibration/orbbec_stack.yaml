@@ -1,0 +1,22 @@
+# camera calibration for the stack and close tasks: orbbec.yaml with xy_correction refit on the stack demos
+# fx, fy, cx, cy are not the factory intrinsics: fx = fy and cy were fit so the table is flat at z = 0
+orbbec:
+  width: 1920
+  height: 1080
+  fx: 1309.3
+  fy: 1309.3
+  cx: 960.0
+  cy: 312.5
+  depth_scale: 0.001
+  T_base_cam: [
+    [-0.025341, 0.426373, -0.904192, 1.408550],
+    [0.999509, 0.027492, -0.015048, -0.052461],
+    [0.018442, -0.904129, -0.426860, 0.757688],
+    [0.000000, 0.000000, 0.000000, 1.000000]
+  ]
+  # only for drawing the tcp in the viewer
+  draw: {mirrored: true, width: 1920, fx: 1229.0, fy: 1229.0, cx: 988.0, cy: 380.0}
+  xy_correction: [
+    [1.070524, 0.019554, -0.054208],
+    [0.023421, -1.155982, -0.164710]
+  ]

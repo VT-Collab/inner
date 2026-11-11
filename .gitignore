@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+single_integrator/toy_environment/venv/
+single_integrator/toy_environment/datasets/
+single_integrator/toy_environment/models/
+single_integrator/experiments/models/
+single_integrator/experiments/logs/
+single_integrator/experiments/figures/
+single_integrator/experiments/figures-svg/
+single_integrator/experiments/jobs_*.txt
+single_integrator/experiments/STOP_*
+hardware/datasets/
+hardware/demos/
+hardware/models/
+hardware/job_outputs/
+hardware/videos/
