@@ -3,7 +3,7 @@
 Code for InneR. [Project page](https://collab.me.vt.edu/inner/).
 
 - `single_integrator/`: single-integrator simulations (MLP and diffusion policies)
-- `drone/`: drone landing simulations (coming soon)
+- `drone/`: drone landing simulations (MLP and diffusion policies)
 - `hardware/`: real-robot experiments (Franka arm, diffusion policy)
 - `docs/`: project page
 

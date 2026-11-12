@@ -1,0 +1,6 @@
+__pycache__/
+.pytest_cache/
+manuscript_runs/
+mlp_runs/models/
+mlp_runs/logs/
+mlp_runs/*.lock
