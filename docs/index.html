@@ -9,6 +9,9 @@
   <meta property="og:title" content="Inner Product Regularization for Imitation Learning">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://collab.me.vt.edu/inner/">
+  <meta property="og:description" content="InneR: Inner Product Regularization for Imitation Learning">
+  <meta property="og:image" content="https://collab.me.vt.edu/inner/static/resources/preview.jpg">
+  <meta name="twitter:card" content="summary_large_image">
   <title>Inner Product Regularization for Imitation Learning</title>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet">
@@ -39,14 +42,18 @@
             </h1>
 
             <div class="is-size-5 publication-authors">
-              <span class="author-block"><a href="https://github.com/benjaminchristie" target="_blank">Benjamin A. Christie</a>,</span>
-              <span class="author-block">Tianyu Qiu,</span>
-              <span class="author-block">Amy H. Choi,</span>
-              <span class="author-block">David Fridovich-Keil,</span>
-              <span class="author-block"><a href="https://dylanlosey.com/" target="_blank">Dylan P. Losey</a></span>
+              <span class="author-block"><a href="https://benjaminchristie.github.io" target="_blank">Benjamin A. Christie</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://tianyuq.github.io" target="_blank">Tianyu Qiu</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://github.com/pronoea" target="_blank">Amy H. Choi</a><sup>2,3</sup>,</span>
+              <span class="author-block"><a href="https://dfridovi.github.io/" target="_blank">David Fridovich-Keil</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://dylanlosey.com/" target="_blank">Dylan P. Losey</a><sup>1</sup></span>
             </div>
 
-            <!-- affiliations go here -->
+            <div class="is-size-6 publication-authors">
+              <span class="author-block"><sup>1</sup>Virginia Tech,</span>
+              <span class="author-block"><sup>2</sup>The University of Texas at Austin,</span>
+              <span class="author-block"><sup>3</sup>KAIST</span>
+            </div>
             <div class="is-size-5 publication-authors">
               <span>Under Review</span>
             </div>
@@ -54,7 +61,7 @@
             <div class="column has-text-centered">
               <div class="publication-links">
                 <span class="link-block">
-                  <a class="button is-normal is-rounded is-dark" disabled title="Coming soon">
+                  <a href="./static/resources/inner.pdf" target="_blank" class="external-link button is-normal is-rounded is-dark">
                     <span class="icon"><i class="fas fa-file-pdf"></i></span>
                     <span>Paper</span>
                   </a>
@@ -83,8 +90,8 @@
     <div class="container is-max-desktop">
       <div class="hero-body">
         <h2 class="subtitle has-text-centered is-size-4">
-          <strong><i>If moving an irrelevant object does not change the policy at one state,
-              it should not change it at a nearby state.</i></strong>
+          <strong><i>The first-order response to state perturbations should be
+			  locally consistent across the policy.</i></strong>
         </h2>
         <img src="./static/resources/front.jpg"
           alt="A robot closing a coffee machine. Under behavior cloning the policy reacts to moving the coffee machine and to moving a banana; with InneR it reacts only to the coffee machine.">
@@ -103,16 +110,20 @@
                 Robots that learn from demonstrations should extrapolate their policy despite state perturbations such
                 as sensor noise, scene variation, and compounding errors. Prior works use regularizers to limit the
                 policy's sensitivity to any perturbation at each individual state. By contrast, our insight is that
-                nearby states should respond to the same perturbation consistently: if moving an irrelevant object
-                does not change the policy at one state, it should not at a nearby state. We therefore develop inner
-                product regularization (InneR). We show that the inner product on action space induces an inner
-                product on state space through the policy Jacobian (the Fisher information for stochastic policies),
-                whose null space governs which perturbations have a first-order effect on the policy. Regularizing
-                each inner product alone only shrinks the policy's sensitivity. Instead, InneR clusters states with
-                aligned inner products, averages each cluster, and minimizes the smallest eigenvalues of that average
-                so that nearby states share a common null space. InneR thus enforces consistent responses without
-                limiting policy expressiveness, and can be appended to existing imitation learning pipelines for
-                deterministic or stochastic policies.
+                nearby states should respond to the same perturbation consistently: if moving an irrelevant object does
+                not change the policy at one state, it should not at a nearby state. We therefore develop inner product
+                regularization (InneR). We show that the inner product on action space induces an inner product on state
+                space through the policy Jacobian (the Fisher information for stochastic policies), whose null space
+                contains the perturbations with no first-order effect on the policy. Regularizing each inner product
+                alone only shrinks the policy's sensitivity. Instead, InneR clusters states with aligned inner products,
+                averages each cluster, and minimizes the smallest eigenvalues of that average so that nearby states
+                share a common null space. InneR thus enforces consistent responses without limiting policy
+                expressiveness, and can be appended to existing imitation learning pipelines for deterministic or
+                stochastic policies. Our experiments compare InneR to behavior cloning and norm regularization methods.
+                In simulated experiments, InneR makes learned policies more robust to irrelevant state dimensions and to
+                shifts between training and test distributions, whereas the norm penalties often perform worse than
+                behavior cloning. On a real robot arm performing three manipulation tasks, InneR raises the average
+                success rate of a diffusion policy from 18% to 57% without additional data.
               </p>
             </div>
           </div>
@@ -161,9 +172,9 @@
         </p>
       </div>
 
-      <h3 class="title is-5" style="margin-top: 2rem;">A small example</h3>
+      <h3 class="title is-5" style="margin-top: 2rem;">Example</h3>
       <p>
-        Twelve states with a two-dimensional state and a one-dimensional action, so every state responds to one
+        Twelve states with a two-dimensional state and a one-dimensional action; every state responds to one
         direction and ignores the other. The states come from two parts of a task that depend on different directions.
       </p>
       <div class="figure" id="fig-idea"></div>
@@ -171,7 +182,7 @@
         <h4>1. Sensitivity at each state</h4>
         <p>The black tick is the direction a state responds to, the row space of its Jacobian in
           \(A(s_i) = J(s_i)^T M J(s_i)\). The gray strokes follow the direction that is ignored, and the
-          orange strokes the direction that should be ignored. After behavior cloning the two disagree, because the
+          orange strokes the direction that should be ignored. After standard behavior cloning the two disagree, because the
           data is noisy.</p>
       </div>
       <div class="step-text">
@@ -195,7 +206,7 @@
       </div>
       <div class="step-text">
         <h4>5. Try it</h4>
-        <p>Change \(\gamma\) and \(k\) below, or apply a norm penalty instead. Drag the white dot to probe another
+        <p>Change \(\gamma\) and \(k\) below. Drag the white dot to probe another
           point. Drag a state to turn the direction its data gives. With \(k = 12\) there is no clustering and
           both parts of the task are pulled onto one direction.</p>
       </div>
@@ -246,8 +257,8 @@
       <h2 class="title is-3">Real-World Experiments</h2>
       <p class="lead">
         We trained diffusion policies for three tasks on a Franka arm: closing a coffee maker, stacking two cubes, and
-        pushing a pot. An apple, an orange, and a banana are also on the table. All methods use the same
-        demonstrations and the same network.
+        pushing a pot. An apple, an orange, and a banana act as distractors. All methods use the same
+        demonstrations and the same architecture.
       </p>
       <div class="figure">
         <svg viewBox="0 0 960 292" role="img"
@@ -261,7 +272,7 @@
             <text x="20" y="20" class="group-title">On the robot</text>
             <rect x="20" y="52" width="160" height="66" rx="6"></rect>
             <text x="100" y="80" class="pipe-title">RGB-D camera</text>
-            <text x="100" y="100" class="pipe-sub">one fixed view</text>
+            <text x="100" y="100" class="pipe-sub">fixed view</text>
             <rect x="215" y="52" width="160" height="66" rx="6"></rect>
             <text x="295" y="80" class="pipe-title">Track objects</text>
             <text x="295" y="100" class="pipe-sub">SAM 3, EdgeTAM</text>
@@ -270,7 +281,7 @@
             <text x="490" y="100" class="pipe-sub">gripper and object poses</text>
             <rect x="605" y="52" width="160" height="66" rx="6"></rect>
             <text x="685" y="80" class="pipe-title">Diffusion policy</text>
-            <text x="685" y="100" class="pipe-sub">MLP denoiser, DDIM</text>
+            <text x="685" y="100" class="pipe-sub">DDIM</text>
             <rect x="800" y="52" width="140" height="66" rx="6"></rect>
             <text x="870" y="80" class="pipe-title">Franka arm</text>
             <text x="870" y="100" class="pipe-sub">target 0.5 s ahead</text>
@@ -303,27 +314,27 @@
         </svg>
       </div>
       <p class="caption">
-        The policy never sees images. Objects are tracked in the camera image and their poses, together with the
+        Objects are tracked in the camera image and their poses, together with the
         gripper's, form the state. The baselines use the same pipeline with a different training loss.
       </p>
 
       <div class="figure" id="fig-clips"></div>
       <p class="caption">
-        Three distractors, 3× speed. Objects are tinted by the masks used to track them.
+        Three distractors, 3× speed. Objects are tinted by the masks generated by EdgeTAM.
       </p>
 
       <h3 class="title is-5" style="margin-top: 2.5rem;">Success rate</h3>
       <div class="figure" id="fig-success"></div>
       <p class="caption">
         The number of distractors is the number of fruit whose pose is in the policy's state. Whiskers are standard
-        error. Hover over a bar for the number of trials.
+        error.
       </p>
 
       <h3 class="title is-5" style="margin-top: 2.5rem;">Observation noise</h3>
       <div class="figure narrow" id="fig-noise"></div>
       <p class="caption">
         <em>Close</em> with three distractors. Gaussian noise is added to every object position that the policy
-        observes. Ten trials per point, twenty without noise.
+        observes.
       </p>
 
       <h3 class="title is-5" style="margin-top: 2.5rem;">Sensitivity to each object</h3>
